@@ -14,6 +14,12 @@
 				that.hide();
 			}
 		});
+		$("form").bind("reset", function() {
+			setTimeout(function(){
+				that.reset(that.element);
+				},
+				100);
+		});
 		if ( this.isInput ) {
 			this.element.on( {
 				focus: $.proxy( this.show, this ),
@@ -71,6 +77,21 @@
 				}
 				break;
 			}
+		},
+		
+		reset:function(element){
+			var $selected, $target;
+			$selected = this.picker.find( 'li.suggestlist-selected' ).first();
+			$selected.removeClass( 'suggestlist-selected' );
+
+			var val = $.trim(element.val() ).replace(/\s+/, ' ');
+				
+			this.picker.find( 'li' ).each( function( i, elem ) {
+				if ( $( elem ).text() === val ) {
+					$( elem ).addClass( 'suggestlist-selected' );
+				}
+			} );
+
 		},
 
 		show: function( event ) {
@@ -145,15 +166,20 @@
 			if ( val === $selected.text() ) {
 				return;
 			}
+
+			$selected.removeClass( 'suggestlist-selected' );
+			
+			length= val.length;
+			this.picker.find( 'li' ).each( function( i, elem ) {
+				if ( $( elem ).text().substr(0, length) === val ) {
+					$( elem ).addClass( 'suggestlist-selected' );
+					return false;
+				}
+			} );
+			
 			if ( $.inArray( val, this.options.list ) === -1 ) {
 				return false;
 			}
-			$selected.removeClass( 'suggestlist-selected' );
-			this.picker.find( 'li' ).each( function( i, elem ) {
-				if ( $( elem ).text() === val ) {
-					$( elem ).addClass( 'suggestlist-selected' );
-				}
-			} );
 			if ( event ) {
 				this.show();
 			}
